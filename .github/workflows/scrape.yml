@@ -1,0 +1,39 @@
+name: Scrape Talabat Brand Directory
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_page:
+        description: 'Start page number'
+        required: false
+        default: '1'
+      end_page:
+        description: 'End page number (0 = auto-detect last page)'
+        required: false
+        default: '0'
+      batch_size:
+        description: 'Pages per batch before pause'
+        required: false
+        default: '50'
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run scraper
+        env:
+          APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
+          START_PAGE: ${{ github.event.inputs.start_page || '1' }}
+          END_PAGE: ${{ github.event.inputs.end_page || '0' }}
+          BATCH_SIZE: ${{ github.event.inputs.batch_size || '50' }}
+        run: node scrape.js
