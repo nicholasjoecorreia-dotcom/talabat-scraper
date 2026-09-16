@@ -10,7 +10,7 @@
 
 const TALABAT_BASE = 'https://www.talabat.com';
 const DIRECTORY_URL = `${TALABAT_BASE}/uae/restaurants`;
-const BRANDS_PER_PAGE = 30;
+const BRANDS_PER_PAGE = 30
 
 // Config from environment
 const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
@@ -73,7 +73,12 @@ async function fetchPage(pageNum) {
         id: r.id || r.brn || '',
         name: r.nam || r.name || '',
         slug: r.slg || r.slug || '',
-        cuisines: (r.csi || r.cuisines || []).map(c => c.nam || c.name || c).join(', '),
+        cuisines: (() => {
+          const raw = r.csi || r.cuisines || [];
+          if (typeof raw === 'string') return raw;
+          if (Array.isArray(raw)) return raw.map(c => c.nam || c.name || c).join(', ');
+          return '';
+        })(),
         logo: r.lgo || r.logo || '',
         brandPageUrl: r.slg ? `${TALABAT_BASE}/uae/${r.slg}` : (r.slug ? `${TALABAT_BASE}/uae/${r.slug}` : ''),
       }));
