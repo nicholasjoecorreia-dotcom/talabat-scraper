@@ -1,0 +1,29 @@
+name: Scrape Talabat Brand Pages (Phase 2)
+
+on:
+  workflow_dispatch:
+    inputs:
+      concurrency:
+        description: 'Concurrent page fetches (default 5)'
+        required: false
+        default: '5'
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run brand page scraper
+        env:
+          APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
+          CONCURRENCY: ${{ github.event.inputs.concurrency || '5' }}
+        run: node scrape-brands.js
